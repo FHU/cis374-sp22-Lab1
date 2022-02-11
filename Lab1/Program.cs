@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using DSA.DataStructures.Trees;
+using System.IO;
 
 namespace Lab1
 {
@@ -9,7 +10,17 @@ namespace Lab1
     {
         static void Main(string[] args)
         {
-            int MAX = 10000;
+            //int MAX = 100000;
+
+            //int MAX = 1000000;
+
+            int MAX = 10000000;
+
+            string times = "";
+
+            //string heights = "";
+
+            var bstKeyValueMap = new RedBlackTreeKeyValueMap<int, int>();
 
             for (int c = 0; c < 10; c++)
             {
@@ -20,42 +31,49 @@ namespace Lab1
                     intKeyValuePairs.Add(new KeyValuePair<int, int>(i, i + 42));
                 }
 
-                //var dictionaryKeyValueMap = new DictionaryKeyValueMap<int, int>();
-                var bstKeyValueMap = new BinarySearchTreeKeyValueMap<int, int>();
+                //intKeyValuePairs.Shuffle();
+                bstKeyValueMap = new RedBlackTreeKeyValueMap<int, int>();
 
+                times += CreateKeyValueMap<int, int>(bstKeyValueMap, intKeyValuePairs);
 
-
-                //Console.WriteLine("DictionaryKeyValueMap");
-                Console.WriteLine("BSTKeyValueMap");
-                Console.WriteLine("Ordered");
-                CreateKeyValueMap<int, int>(bstKeyValueMap, intKeyValuePairs);
-
-                Console.WriteLine("Unordered");
-                intKeyValuePairs.Shuffle();
-                bstKeyValueMap = new BinarySearchTreeKeyValueMap<int, int>();
-
-                CreateKeyValueMap<int, int>(bstKeyValueMap, intKeyValuePairs);
+                //heights += bstKeyValueMap.Height + ", ";
             }
-
+            try
+            {
+                StreamWriter sw = new StreamWriter(path: "/Users/greenegunnar/Documents/CIS374/Labs/Lab1Data.txt", append:true);
+                sw.WriteLine(times);
+                sw.WriteLine();
+                sw.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception: " + e.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Times written to Lab1Data.txt");
+            }
         }
 
 
-        public static void CreateKeyValueMap<TKey, TValue>(
+        public static string CreateKeyValueMap<TKey, TValue>(
                 IKeyValueMap<TKey,TValue> keyValueMap,
                 List<KeyValuePair<TKey, TValue>> keyValuePairs )
         {
-            Stopwatch stopwatch = new Stopwatch();
 
-            stopwatch.Start();
             foreach( var kvp in keyValuePairs)
             {
                 keyValueMap.Add(kvp.Key, kvp.Value);
             }
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            //QueryKeyValueMap(keyValueMap, keyValuePairs);
+            RemoveKeyValueMap(keyValueMap, keyValuePairs);
+
             stopwatch.Stop();
-
-            Console.WriteLine(stopwatch.Elapsed.TotalSeconds);
-            Console.WriteLine(keyValueMap.Height);
-
+            return stopwatch.Elapsed.TotalSeconds + ", ";
         }
 
 
@@ -63,14 +81,20 @@ namespace Lab1
                 IKeyValueMap<TKey, TValue> keyValueMap,
                 List<KeyValuePair<TKey, TValue>> keyValuePairs)
         {
-           
+           foreach (var kvp in keyValuePairs)
+            {
+                keyValueMap.Get(kvp.Key);
+            }
         }
 
         public static void RemoveKeyValueMap<TKey, TValue>(
                 IKeyValueMap<TKey, TValue> keyValueMap,
                 List<KeyValuePair<TKey, TValue>> keyValuePairs)
         {
-            
+            foreach (var kvp in keyValuePairs)
+            {
+                keyValueMap.Remove(kvp.Key);
+            }
         }
     }
 }
